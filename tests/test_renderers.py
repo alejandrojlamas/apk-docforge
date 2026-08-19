@@ -70,8 +70,8 @@ def test_render_report_and_codex_prompt() -> None:
     report = render_report(data)
     prompt = render_codex_prompt(data)
     assert "# apk-docforge static analysis report" in report
-    assert "## Que Es Y Como Funciona" in report
-    assert "# Prompt maestro para registrar ingeniería inversa Android" in prompt
-    assert "Redacta el registro de ingeniería inversa en lenguaje natural" in prompt
-    assert "## Paquete de evidencia de esta app" in prompt
-    assert "No inventes funcionalidades sin evidencia" in prompt
+    assert "## What It Is And How It Works" in report
+    assert "# Master prompt for documenting Android reverse engineering" in prompt
+    assert "Write the reverse-engineering record in natural language" in prompt
+    assert "## Evidence package for this app" in prompt
+    assert "Do not invent features without evidence" in prompt

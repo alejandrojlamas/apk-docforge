@@ -95,16 +95,16 @@ class DeepSeekDocumentationClient:
                 {
                     "role": "system",
                     "content": (
-                        "Eres un redactor técnico de auditorías Android. Usa solo la evidencia JSON. "
-                        "No inventes datos. Marca unknown cuando falte evidencia. "
-                        "No propongas bypasses de login, pagos, DRM, licencias, certificate pinning ni controles de seguridad."
+                        "You are a technical writer for Android audits. Use only the JSON evidence. "
+                        "Do not invent facts. Mark details unknown when evidence is missing. "
+                        "Do not propose bypasses for login, payments, DRM, licenses, certificate pinning, or security controls."
                     ),
                 },
                 {
                     "role": "user",
                     "content": (
-                        "Genera documentación Markdown concisa y estructurada para esta app Android. "
-                        "Incluye evidencia y confidence_score donde aplique.\n\n"
+                        "Generate concise, structured Markdown documentation for this Android app. "
+                        "Include evidence and confidence_score where applicable.\n\n"
                         f"{context_json}"
                     ),
                 },

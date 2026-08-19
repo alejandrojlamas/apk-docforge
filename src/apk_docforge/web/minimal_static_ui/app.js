@@ -35,7 +35,7 @@ function bindUploadFlow() {
   const dropZone = $("#dropZone");
 
   fileInput.addEventListener("change", () => {
-    selectedFile.textContent = fileInput.files[0]?.name || "Ningun archivo seleccionado";
+    selectedFile.textContent = fileInput.files[0]?.name || "No file selected";
   });
 
   ["dragenter", "dragover"].forEach((eventName) => {
@@ -62,7 +62,7 @@ function bindUploadFlow() {
   $("#uploadForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const submit = event.submitter;
-    setBusy(submit, true, "Procesando");
+    setBusy(submit, true, "Processing");
     resetProgress();
     try {
       const localPath = $("#localPath").value.trim();
@@ -73,7 +73,7 @@ function bindUploadFlow() {
         return;
       }
       if (!fileInput.files.length) {
-        throw new Error("Selecciona un archivo APK, APKS o XAPK, o escribe una ruta local.");
+        throw new Error("Select an APK, APKS, or XAPK file, or enter a local path.");
       }
       setStep("source", "done");
       setStep("download", "active");
@@ -97,12 +97,12 @@ function bindSearchFlow() {
   $("#searchForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const submit = event.submitter;
-    setBusy(submit, true, "Buscando");
+    setBusy(submit, true, "Searching");
     resetProgress();
     try {
       const query = $("#searchQuery").value.trim();
       const sources = $$("input[name='source']:checked").map((input) => input.value);
-      if (!sources.length) throw new Error("Selecciona al menos una fuente permitida.");
+      if (!sources.length) throw new Error("Select at least one approved source.");
       setStep("source", "active");
       const result = await api("/api/search", {
         method: "POST",
@@ -112,9 +112,9 @@ function bindSearchFlow() {
       renderCandidates(result.candidates || []);
       showOutput(result);
       if (!result.candidates?.length) {
-        notify("No se encontraron candidatos descargables. Revisa fuente, permisos o allowlist.", "error");
+        notify("No downloadable candidates were found. Check the source, permissions, or allowlist.", "error");
       } else {
-        notify("Candidatos encontrados. Elige descargar o descargar y analizar.", "ok");
+        notify("Candidates found. Choose download or download and analyze.", "ok");
       }
     } catch (error) {
       showError(error);
@@ -133,7 +133,7 @@ function bindDeviceFlow() {
   $("#deviceForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const submit = event.submitter;
-    setBusy(submit, true, "Importando");
+    setBusy(submit, true, "Importing");
     resetProgress();
     try {
       setStep("source", "active");
@@ -150,7 +150,7 @@ function bindDeviceFlow() {
       setStep("quarantine", "done");
       renderDeviceImport(result);
       showOutput(result);
-      notify("APK importada desde dispositivo. Puedes analizarla desde el resultado.", "ok");
+      notify("APK imported from the device. You can analyze it from the result.", "ok");
     } catch (error) {
       showError(error);
     } finally {
@@ -163,7 +163,7 @@ function bindSettingsFlow() {
   $("#settingsForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const submit = event.submitter;
-    setBusy(submit, true, "Guardando");
+    setBusy(submit, true, "Saving");
     try {
       const payload = {
         documentation_provider: "deepseek",
@@ -180,7 +180,7 @@ function bindSettingsFlow() {
       $("#deepseekKey").value = "";
       $("#clearDeepseek").checked = false;
       renderSettings(result);
-      notify("Ajustes guardados localmente.", "ok");
+      notify("Settings saved locally.", "ok");
     } catch (error) {
       showError(error);
     } finally {
@@ -199,7 +199,7 @@ function bindUtilityActions() {
   $("#refreshAnalyses").addEventListener("click", loadAnalyses);
   $("#clearOutput").addEventListener("click", () => {
     $("#outputBox").textContent = "";
-    notify("Salida limpia.");
+    notify("Output cleared.");
   });
 }
 
@@ -212,10 +212,10 @@ async function loadHealth() {
   try {
     const health = await api("/api/health");
     const available = Object.values(health.tools || {}).filter((tool) => tool.available).length;
-    badge.textContent = `Servidor activo · ${available} herramientas`;
+    badge.textContent = `Server online · ${available} tools`;
     badge.className = "status-pill ok";
   } catch {
-    badge.textContent = "Servidor no disponible";
+    badge.textContent = "Server unavailable";
     badge.className = "status-pill error";
   }
 }
@@ -225,13 +225,13 @@ async function loadSources() {
   const container = $("#sourceList");
   const sources = result.sources || [];
   if (!sources.length) {
-    container.innerHTML = `<p class="empty-state">No hay fuentes configuradas.</p>`;
+    container.innerHTML = `<p class="empty-state">No sources are configured.</p>`;
     return;
   }
   container.innerHTML = sources
     .map((source) => {
       const blocked = !source.enabled || String(source.policy_status).includes("DISABLED");
-      const badge = blocked ? "Bloqueada" : "Lista";
+      const badge = blocked ? "Blocked" : "Ready";
       return `
         <div class="source-item">
           <div>
@@ -260,10 +260,10 @@ function renderSettings(settings) {
   $("#googleCredsPath").value = "";
   $("#allowDynamic").checked = Boolean(settings.allow_dynamic);
   const rows = [
-    ["DeepSeek", settings.deepseek_api_key_configured ? "Configurado" : "Sin clave"],
-    ["URL oficial", settings.official_url_hosts?.length ? settings.official_url_hosts.join(", ") : "Sin hosts"],
-    ["Google Play", settings.google_play_credentials_configured ? "Credenciales listas" : "Sin credenciales"],
-    ["Modo dinamico", settings.allow_dynamic ? "Permitido con dispositivo" : "Apagado por defecto"],
+    ["DeepSeek", settings.deepseek_api_key_configured ? "Configured" : "No key"],
+    ["Official URL", settings.official_url_hosts?.length ? settings.official_url_hosts.join(", ") : "No hosts"],
+    ["Google Play", settings.google_play_credentials_configured ? "Credentials ready" : "No credentials"],
+    ["Dynamic mode", settings.allow_dynamic ? "Allowed with a device" : "Off by default"],
   ];
   $("#settingsState").innerHTML = rows
     .map(([key, value]) => `<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd></div>`)
@@ -273,7 +273,7 @@ function renderSettings(settings) {
 function renderCandidates(candidates) {
   const container = $("#candidateResults");
   if (!candidates.length) {
-    container.innerHTML = `<p class="empty-state">No hay candidatos. Prueba F-Droid, GitHub, una URL oficial allowlist o credenciales de Google Play Developer.</p>`;
+    container.innerHTML = `<p class="empty-state">No candidates found. Try F-Droid, GitHub, an allowlisted official URL, or Google Play Developer credentials.</p>`;
     return;
   }
   container.innerHTML = candidates
@@ -281,12 +281,12 @@ function renderCandidates(candidates) {
       const canDownload = Boolean(candidate.download_url);
       return `
         <article class="result-item">
-          <h3>${escapeHtml(candidate.app_name || candidate.package_name || "App sin nombre")}</h3>
-          <p class="meta-line">${escapeHtml(candidate.package_name || "package desconocido")} · ${escapeHtml(candidate.source || "fuente desconocida")} · ${escapeHtml(candidate.version_name || "version desconocida")}</p>
-          <p class="meta-line">${escapeHtml(candidate.download_url || candidate.source_url || "sin URL descargable")}</p>
+          <h3>${escapeHtml(candidate.app_name || candidate.package_name || "Unnamed app")}</h3>
+          <p class="meta-line">${escapeHtml(candidate.package_name || "unknown package")} · ${escapeHtml(candidate.source || "unknown source")} · ${escapeHtml(candidate.version_name || "unknown version")}</p>
+          <p class="meta-line">${escapeHtml(candidate.download_url || candidate.source_url || "no downloadable URL")}</p>
           <div class="item-actions">
-            <button class="secondary-button" type="button" data-download="${candidate.id}" ${canDownload ? "" : "disabled"}>Descargar</button>
-            <button class="primary-button" type="button" data-download-analyze="${candidate.id}" ${canDownload ? "" : "disabled"}>Descargar y analizar</button>
+            <button class="secondary-button" type="button" data-download="${candidate.id}" ${canDownload ? "" : "disabled"}>Download</button>
+            <button class="primary-button" type="button" data-download-analyze="${candidate.id}" ${canDownload ? "" : "disabled"}>Download and analyze</button>
           </div>
         </article>
       `;
@@ -305,17 +305,17 @@ function renderDeviceImport(result) {
   const container = $("#deviceResults");
   const artifacts = result.artifacts || [];
   if (!artifacts.length) {
-    container.innerHTML = `<p class="empty-state">No se importaron APKs desde el dispositivo.</p>`;
+    container.innerHTML = `<p class="empty-state">No APKs were imported from the device.</p>`;
     return;
   }
   container.innerHTML = artifacts
     .map((artifact, index) => `
       <article class="result-item">
         <h3>${escapeHtml(result.package_name)} · APK ${index + 1}</h3>
-        <p class="meta-line">${escapeHtml(artifact.local_path || "sin ruta local")}</p>
-        <p class="meta-line">SHA256 ${escapeHtml(artifact.sha256 || "no calculado")}</p>
+        <p class="meta-line">${escapeHtml(artifact.local_path || "no local path")}</p>
+        <p class="meta-line">SHA256 ${escapeHtml(artifact.sha256 || "not calculated")}</p>
         <div class="item-actions">
-          <button class="primary-button" type="button" data-analyze-path="${escapeHtml(artifact.local_path || "")}" ${artifact.local_path ? "" : "disabled"}>Analizar esta APK</button>
+          <button class="primary-button" type="button" data-analyze-path="${escapeHtml(artifact.local_path || "")}" ${artifact.local_path ? "" : "disabled"}>Analyze this APK</button>
         </div>
       </article>
     `)
@@ -328,17 +328,17 @@ function renderDeviceImport(result) {
 function renderAnalyses(analyses) {
   const container = $("#analysisList");
   if (!analyses.length) {
-    container.innerHTML = `<p class="empty-state">Aun no hay reportes generados.</p>`;
+    container.innerHTML = `<p class="empty-state">No reports have been generated yet.</p>`;
     return;
   }
   container.innerHTML = analyses
     .map((analysis) => `
       <article class="analysis-item">
-        <h3>${escapeHtml(analysis.package_name || analysis.analysis_id || "Analisis")}</h3>
+        <h3>${escapeHtml(analysis.package_name || analysis.analysis_id || "Analysis")}</h3>
         <p class="meta-line">${escapeHtml(analysis.mode || "static")} · ${escapeHtml(analysis.status || "unknown")}</p>
         <div class="item-actions">
-          <button class="secondary-button" type="button" data-report="${escapeHtml(analysis.analysis_id || analysis.db_analysis_id)}">Ver reporte</button>
-          <button class="secondary-button" type="button" data-prompt="${escapeHtml(analysis.analysis_id || analysis.db_analysis_id)}">Ver prompt Codex</button>
+          <button class="secondary-button" type="button" data-report="${escapeHtml(analysis.analysis_id || analysis.db_analysis_id)}">View report</button>
+          <button class="secondary-button" type="button" data-prompt="${escapeHtml(analysis.analysis_id || analysis.db_analysis_id)}">View Codex prompt</button>
         </div>
       </article>
     `)
@@ -352,7 +352,7 @@ function renderAnalyses(analyses) {
 }
 
 async function downloadCandidate(candidateId, { analyze = false, button } = {}) {
-  setBusy(button, true, analyze ? "Descargando" : "Descargando");
+  setBusy(button, true, "Downloading");
   try {
     setStep("download", "active");
     const result = await api("/api/download", {
@@ -363,7 +363,7 @@ async function downloadCandidate(candidateId, { analyze = false, button } = {}) 
     setStep("download", "done");
     setStep("quarantine", "done");
     showOutput(result);
-    notify("Descarga completada en cuarentena y carpeta local.", "ok");
+    notify("Download completed in quarantine and the local output directory.", "ok");
     if (analyze) {
       await analyzePath(result.local_path);
     }
@@ -375,8 +375,8 @@ async function downloadCandidate(candidateId, { analyze = false, button } = {}) 
 }
 
 async function analyzePath(path, { mode = "static", device = "", button } = {}) {
-  if (!path) throw new Error("Falta una ruta local para analizar.");
-  setBusy(button, true, "Analizando");
+  if (!path) throw new Error("A local path is required for analysis.");
+  setBusy(button, true, "Analyzing");
   try {
     setStep("analysis", "active");
     const result = await api("/api/analyze", {
@@ -391,7 +391,7 @@ async function analyzePath(path, { mode = "static", device = "", button } = {}) 
     setStep("analysis", "done");
     setStep("report", "done");
     showOutput(result);
-    notify("Documentacion generada. Abre el reporte en la lista de reportes.", "ok");
+    notify("Documentation generated. Open the report from the reports list.", "ok");
     await loadAnalyses();
   } catch (error) {
     showError(error);
@@ -405,7 +405,7 @@ async function loadTextArtifact(analysisId, kind) {
     const result = await api(`/api/analyses/${encodeURIComponent(analysisId)}/${kind}`);
     const text = result.report || result.codex_prompt || "";
     $("#outputBox").textContent = text;
-    notify(kind === "report" ? "Reporte cargado." : "Prompt Codex cargado.", "ok");
+    notify(kind === "report" ? "Report loaded." : "Codex prompt loaded.", "ok");
   } catch (error) {
     showError(error);
   }
@@ -427,7 +427,7 @@ function getSelectedMode() {
   return document.querySelector("input[name='mode']:checked")?.value || "static";
 }
 
-function setBusy(button, busy, busyText = "Procesando") {
+function setBusy(button, busy, busyText = "Processing") {
   if (!button) return;
   if (busy) {
     button.dataset.originalText = button.textContent;
