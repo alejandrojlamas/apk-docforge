@@ -125,11 +125,11 @@ class AppUnderstandingAgent(BaseAgent):
         what_it_is = (
             summary
             or description
-            or f"Aplicacion Android llamada {identity_name}; su proposito exacto requiere mas evidencia."
+            or f"Android application named {identity_name}; its exact purpose requires more evidence."
         )
         purpose = (
             description
-            or f"Permite funcionalidades detectadas como {capability_text}, segun recursos, permisos y cadenas."
+            or f"It supports detected capabilities such as {capability_text}, based on resources, permissions, and strings."
         )
         flows = _generic_flows(features, screens, permissions)
         confidence = 0.82 if source_metadata.get("description") else 0.55 if features or screens else 0.25
@@ -139,13 +139,13 @@ class AppUnderstandingAgent(BaseAgent):
             "what_it_is": what_it_is,
             "purpose": purpose,
             "how_it_works": _generic_how_it_works(features, permissions),
-            "primary_users": ["Usuarios finales de la app"] if confidence >= 0.5 else ["unknown"],
+            "primary_users": ["App end users"] if confidence >= 0.5 else ["unknown"],
             "core_flows": flows,
             "confidence_score": confidence,
             "evidence_refs": source_evidence if source_metadata.get("description") else manifest_evidence,
             "unknowns": [
-                "Flujos runtime no observados sin analisis dinamico.",
-                "Reglas de negocio del servidor no visibles desde el APK.",
+                "Runtime flows were not observed without dynamic analysis.",
+                "Server-side business rules are not visible from the APK.",
             ],
         }
 
@@ -161,11 +161,11 @@ class AppUnderstandingAgent(BaseAgent):
         features = self.context.data.get("features", [])
         permissions = self.context.data.get("permissions", [])
         return {
-            "codex_goal": f"Rehacer una app Android equivalente a: {understanding.get('what_it_is')}",
+            "codex_goal": f"Recreate an equivalent Android app for: {understanding.get('what_it_is')}",
             "recommended_mvp_scope": [
-                "Pantallas principales detectadas con datos mock cuando el backend no este documentado.",
-                "Flujos no destructivos asociados a funcionalidades con evidencia.",
-                "Documentacion clara de supuestos y unknowns.",
+                "Detected primary screens using mock data when the backend is undocumented.",
+                "Non-destructive flows associated with evidence-backed features.",
+                "Clear documentation of assumptions and unknowns.",
             ],
             "screen_blueprint": _screen_blueprint(screens),
             "core_data_models": _generic_data_models(features),
@@ -181,9 +181,9 @@ class AppUnderstandingAgent(BaseAgent):
             ],
             "privacy_security_requirements": _privacy_requirements(permissions),
             "out_of_scope": [
-                "No replicar servicios privados ni credenciales reales.",
-                "No evadir pagos, licencias, login, DRM ni controles anti-tamper.",
-                "No ejecutar acciones irreversibles sin entorno de prueba.",
+                "Do not replicate private services or real credentials.",
+                "Do not bypass payments, licensing, login, DRM, or anti-tamper controls.",
+                "Do not execute irreversible actions outside a test environment.",
             ],
             "open_questions": understanding.get("unknowns", []),
             "evidence_refs": understanding.get("evidence_refs", []),
@@ -209,61 +209,61 @@ def _known_profile(
 ) -> dict[str, Any] | None:
     if package_name != "org.fdroid.fdroid":
         return None
-    summary = source_metadata.get("summary") or "Repositorio de apps que respeta libertad y privacidad."
+    summary = source_metadata.get("summary") or "An app repository that respects freedom and privacy."
     return {
         "status": "observed",
         "app_name": source_metadata.get("app_name") or "F-Droid",
         "what_it_is": summary,
         "purpose": (
-            "Cliente Android para descubrir, navegar, instalar y mantener actualizadas "
-            "aplicaciones de software libre desde repositorios F-Droid compatibles."
+            "An Android client for discovering, browsing, installing, and updating "
+            "free and open-source applications from compatible F-Droid repositories."
         ),
         "how_it_works": [
             {
-                "step": "Sincroniza indices de repositorios compatibles con F-Droid.",
+                "step": "Synchronizes indexes from F-Droid-compatible repositories.",
                 "status": "observed",
                 "confidence_score": 0.9,
                 "evidence_refs": evidence_refs,
             },
             {
-                "step": "Permite buscar, filtrar y abrir fichas de aplicaciones del catalogo.",
+                "step": "Supports searching, filtering, and opening catalog app details.",
                 "status": "observed",
                 "confidence_score": 0.9,
                 "evidence_refs": evidence_refs,
             },
             {
-                "step": "Descarga APKs, verifica firmas/hashes del indice y delega instalacion al sistema.",
+                "step": "Downloads APKs, verifies index signatures and hashes, and delegates installation to the system.",
                 "status": "observed",
                 "confidence_score": 0.86,
                 "evidence_refs": evidence_refs,
             },
             {
-                "step": "Rastrea apps instaladas y actualizaciones disponibles.",
+                "step": "Tracks installed apps and available updates.",
                 "status": "observed",
                 "confidence_score": 0.86,
                 "evidence_refs": evidence_refs,
             },
         ],
         "primary_users": [
-            "Usuarios Android que quieren instalar apps libres/open-source.",
-            "Usuarios que prefieren repositorios verificables fuera de tiendas comerciales.",
-            "Desarrolladores o auditores que necesitan revisar fuente, licencia y versiones.",
+            "Android users who want to install free and open-source apps.",
+            "Users who prefer verifiable repositories outside commercial stores.",
+            "Developers or auditors who need to review source, licenses, and versions.",
         ],
         "core_flows": [
-            _flow("Explorar catalogo", "Navegar apps por categorias y listados.", 0.9, evidence_refs),
-            _flow("Buscar app", "Encontrar apps por nombre o descripcion.", 0.9, evidence_refs),
-            _flow("Ver detalle de app", "Revisar descripcion, versiones, licencia, enlaces y permisos.", 0.86, evidence_refs),
-            _flow("Instalar o actualizar", "Descargar APK verificado y solicitar instalacion al sistema.", 0.84, evidence_refs),
-            _flow("Gestionar repositorios", "Agregar, activar o actualizar repositorios compatibles.", 0.82, evidence_refs),
-            _flow("Notificaciones de updates", "Avisar cuando existan actualizaciones.", 0.78, evidence_refs),
-            _flow("Escanear QR/enlace repo", "Agregar repositorios desde QR o deep link.", 0.7, evidence_refs),
+            _flow("Browse catalog", "Browse apps by category and listing.", 0.9, evidence_refs),
+            _flow("Search apps", "Find apps by name or description.", 0.9, evidence_refs),
+            _flow("View app details", "Review descriptions, versions, licenses, links, and permissions.", 0.86, evidence_refs),
+            _flow("Install or update", "Download a verified APK and request system installation.", 0.84, evidence_refs),
+            _flow("Manage repositories", "Add, enable, or update compatible repositories.", 0.82, evidence_refs),
+            _flow("Update notifications", "Notify users when updates are available.", 0.78, evidence_refs),
+            _flow("Scan QR/repository link", "Add repositories from a QR code or deep link.", 0.7, evidence_refs),
         ],
         "confidence_score": 0.9,
         "evidence_refs": evidence_refs,
         "unknowns": [
-            "Arquitectura interna exacta queda limitada si jadx/apktool no estan instalados.",
-            "Transiciones de pantalla reales requieren analisis dinamico en emulador.",
-            "Detalles de sincronizacion, mirrors e instalacion dependen del codigo runtime.",
+            "Exact internal architecture is limited when jadx/apktool are not installed.",
+            "Real screen transitions require dynamic analysis in an emulator.",
+            "Synchronization, mirror, and installation details depend on runtime code.",
         ],
     }
 
@@ -276,26 +276,26 @@ def _known_reconstruction_profile(
     evidence_refs = understanding.get("evidence_refs", [])
     return {
         "codex_goal": (
-            "Rehacer una app tipo cliente F-Droid: un catalogo Android de aplicaciones libres "
-            "que permite explorar, buscar, gestionar repositorios, ver detalles, instalar y actualizar APKs "
-            "con verificacion de indices y hashes."
+            "Recreate an F-Droid-style client: an Android catalog of free applications "
+            "that supports browsing, searching, repository management, app details, installation, and APK updates "
+            "with index and hash verification."
         ),
         "recommended_mvp_scope": [
-            "Catalogo local/mock con listas de apps, categorias, busqueda y detalle.",
-            "Pantalla de repositorios con agregar/activar/desactivar/actualizar.",
-            "Flujo de descarga/instalacion simulado o delegado al instalador Android en entorno propio.",
-            "Pantalla de actualizaciones e historial basados en datos mock o API permitida.",
-            "Ajustes de privacidad, red, notificaciones y preferencias de instalacion.",
+            "Local/mock catalog with app lists, categories, search, and details.",
+            "Repository screen with add, enable, disable, and update actions.",
+            "Simulated download/install flow or delegation to the Android installer in an owned environment.",
+            "Updates and history screens backed by mock data or an approved API.",
+            "Privacy, network, notification, and installation preferences.",
         ],
         "screen_blueprint": [
-            _screen("Inicio/Catalogo", "Lista destacada, categorias, estado de sincronizacion."),
-            _screen("Busqueda", "Input de busqueda, filtros, resultados por compatibilidad/version."),
-            _screen("Detalle de app", "Descripcion, capturas, versiones, licencia, permisos, enlaces."),
-            _screen("Actualizaciones", "Apps instaladas con versiones disponibles y acciones seguras."),
-            _screen("Repositorios", "Lista de repos, estado, fingerprint, ultimo update, accion agregar."),
-            _screen("Agregar repositorio", "Entrada URL/QR, validacion de firma y vista previa."),
-            _screen("Descargas", "Cola, progreso, hashes, errores y reintentos."),
-            _screen("Ajustes", "Preferencias de red, notificaciones, actualizaciones automaticas y privacidad."),
+            _screen("Home/Catalog", "Featured list, categories, and synchronization status."),
+            _screen("Search", "Search input, filters, and compatibility/version results."),
+            _screen("App details", "Description, screenshots, versions, license, permissions, and links."),
+            _screen("Updates", "Installed apps with available versions and safe actions."),
+            _screen("Repositories", "Repository list, status, fingerprint, last update, and add action."),
+            _screen("Add repository", "URL/QR input, signature validation, and preview."),
+            _screen("Downloads", "Queue, progress, hashes, errors, and retries."),
+            _screen("Settings", "Network, notification, automatic update, and privacy preferences."),
         ],
         "core_data_models": [
             "Repository(id, name, url, fingerprint, enabled, lastUpdated, mirrors)",
@@ -317,27 +317,27 @@ def _known_reconstruction_profile(
             for flow in understanding.get("core_flows", [])
         ],
         "privacy_security_requirements": [
-            "Verificar firmas del indice y hashes SHA-256 antes de marcar una descarga como confiable.",
-            "No enviar telemetria por defecto; explicar cualquier conexion externa.",
-            "Delegar instalacion/eliminacion al sistema operativo y mostrar confirmaciones.",
-            "Separar repos oficiales, personalizados y no confiables con estados visibles.",
-            "Guardar preferencias y cache de indices localmente con limpieza configurable.",
+            "Verify index signatures and SHA-256 hashes before marking a download as trusted.",
+            "Do not send telemetry by default; explain every external connection.",
+            "Delegate installation/removal to the operating system and show confirmations.",
+            "Separate official, custom, and untrusted repositories with visible status.",
+            "Store preferences and index caches locally with configurable cleanup.",
         ],
         "implementation_notes_for_codex": [
-            "Usar datos mock versionados si no se conecta a un repositorio F-Droid real.",
-            "Separar capa UI, repositorio de datos, verificador de hashes y gestor de descargas.",
-            "Documentar todas las pantallas con evidencia y marcar inferencias.",
-            "No implementar bypasses ni instalacion silenciosa fuera de APIs permitidas.",
+            "Use versioned mock data when no real F-Droid repository is connected.",
+            "Separate the UI, data repository, hash verifier, and download manager layers.",
+            "Document every screen with evidence and label inferences.",
+            "Do not implement bypasses or silent installation outside approved APIs.",
         ],
         "out_of_scope": [
-            "Clonar marca/arte protegido mas alla de documentacion autorizada.",
-            "Descargar apps pagadas, privadas o restringidas.",
-            "Evadir firmas, pinning, login, licencias, pagos, DRM o anti-tamper.",
+            "Clone protected branding/art beyond authorized documentation.",
+            "Download paid, private, or restricted apps.",
+            "Bypass signatures, pinning, login, licensing, payments, DRM, or anti-tamper controls.",
         ],
         "open_questions": [
-            "Framework UI exacto de la app original sin JADX/APKTool.",
-            "Diseno visual final, iconografia y copy exacto.",
-            "API o fuente de catalogo que debera usar la reconstruccion.",
+            "Exact UI framework of the original app without JADX/APKTool.",
+            "Final visual design, iconography, and exact copy.",
+            "API or catalog source that the reconstruction should use.",
         ],
         "evidence_refs": evidence_refs,
         "source_urls": {
@@ -356,13 +356,13 @@ def _generic_flows(
     flows: list[dict[str, Any]] = []
     feature_map = {str(item.get("name", "")).lower(): item for item in features}
     for needle, flow_name, description in [
-        ("login", "Login/autenticacion", "Permitir ingreso de usuario o sesion."),
-        ("registro", "Registro", "Crear cuenta o perfil inicial."),
-        ("búsqueda", "Busqueda", "Buscar contenido o elementos dentro de la app."),
-        ("pagos", "Pagos/suscripciones", "Gestionar compra, pago o suscripcion si aplica."),
-        ("cámara", "Camara/escaneo", "Capturar imagen o escanear codigos."),
-        ("notificaciones", "Notificaciones", "Recibir avisos del sistema o push."),
-        ("deep links", "Deep links", "Abrir destinos internos desde enlaces externos."),
+        ("login", "Login/authentication", "Allow a user to sign in or start a session."),
+        ("registration", "Registration", "Create an account or initial profile."),
+        ("search", "Search", "Search for content or items within the app."),
+        ("payment", "Payments/subscriptions", "Manage purchases, payments, or subscriptions when applicable."),
+        ("camera", "Camera/scanning", "Capture images or scan codes."),
+        ("notification", "Notifications", "Receive system or push notifications."),
+        ("deep links", "Deep links", "Open internal destinations from external links."),
     ]:
         matched = next((item for key, item in feature_map.items() if needle in key), None)
         if matched:
@@ -379,8 +379,8 @@ def _generic_flows(
         for screen in screens[:5]:
             flows.append(
                 _flow(
-                    f"Pantalla {screen.get('name')}",
-                    "Validar proposito con analisis dinamico o codigo decompilado.",
+                    f"Screen {screen.get('name')}",
+                    "Validate the purpose using dynamic analysis or decompiled code.",
                     float(screen.get("confidence", 0.45)),
                     screen.get("evidence_refs", []),
                 )
@@ -388,8 +388,8 @@ def _generic_flows(
     if not flows and permissions:
         flows.append(
             _flow(
-                "Flujo principal unknown",
-                "Solo hay evidencia de permisos; hace falta mas contexto funcional.",
+                "Primary flow unknown",
+                "Only permission evidence is available; more functional context is required.",
                 0.25,
                 permissions[0].get("evidence_refs", []),
             )
@@ -404,7 +404,7 @@ def _generic_how_it_works(
     if features:
         rows.append(
             {
-                "step": "Expone funcionalidades inferidas desde recursos, cadenas, permisos o SDKs.",
+                "step": "Exposes features inferred from resources, strings, permissions, or SDKs.",
                 "status": "inferred",
                 "confidence_score": 0.55,
                 "evidence_refs": features[0].get("evidence_refs", []),
@@ -413,7 +413,7 @@ def _generic_how_it_works(
     if permissions:
         rows.append(
             {
-                "step": "Solicita permisos Android para habilitar capacidades del dispositivo.",
+                "step": "Requests Android permissions to enable device capabilities.",
                 "status": "observed",
                 "confidence_score": 0.7,
                 "evidence_refs": permissions[0].get("evidence_refs", []),
@@ -421,7 +421,7 @@ def _generic_how_it_works(
         )
     return rows or [
         {
-            "step": "Funcionamiento interno unknown; requiere decompilacion o analisis dinamico.",
+            "step": "Internal behavior is unknown; decompilation or dynamic analysis is required.",
             "status": "unknown",
             "confidence_score": 0.0,
             "evidence_refs": [],
@@ -431,11 +431,11 @@ def _generic_how_it_works(
 
 def _screen_blueprint(screens: list[dict[str, Any]]) -> list[dict[str, Any]]:
     if not screens:
-        return [{"name": "unknown", "description": "No se mapearon pantallas con evidencia suficiente."}]
+        return [{"name": "unknown", "description": "No screens were mapped with sufficient evidence."}]
     return [
         {
             "name": screen.get("name"),
-            "description": screen.get("description") or "Pantalla inferida desde recursos/manifest.",
+            "description": screen.get("description") or "Screen inferred from resources/manifest.",
             "source": screen.get("source"),
             "confidence_score": screen.get("confidence"),
             "evidence_refs": screen.get("evidence_refs", []),
@@ -447,24 +447,24 @@ def _screen_blueprint(screens: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _generic_data_models(features: list[dict[str, Any]]) -> list[str]:
     models = ["AppState", "UserPreference"]
     names = {str(item.get("name", "")).lower() for item in features}
-    if any("login" in name or "registro" in name for name in names):
+    if any("login" in name or "registration" in name for name in names):
         models.extend(["User", "Session"])
-    if any("pago" in name or "suscrip" in name for name in names):
+    if any("payment" in name or "subscription" in name for name in names):
         models.extend(["Product", "Subscription", "PaymentAttempt"])
     if any("chat" in name for name in names):
         models.extend(["Conversation", "Message"])
-    if any("cache" in name or "base de datos" in name for name in names):
+    if any("cache" in name or "database" in name for name in names):
         models.extend(["LocalRecord", "SyncState"])
     return models
 
 
 def _privacy_requirements(permissions: list[dict[str, Any]]) -> list[str]:
     if not permissions:
-        return ["Mantener permisos en unknown hasta validar manifest y runtime."]
+        return ["Keep permissions unknown until the manifest and runtime are validated."]
     rows = []
     for permission in permissions[:10]:
         rows.append(
-            f"Justificar {permission.get('name')} antes de solicitarlo; riesgo={permission.get('risk')}."
+            f"Justify {permission.get('name')} before requesting it; risk={permission.get('risk')}."
         )
     return rows
 

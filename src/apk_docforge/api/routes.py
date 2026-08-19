@@ -107,7 +107,7 @@ def upload_artifact(file: UploadFile = File(...)) -> dict[str, Any]:
     if suffix not in UPLOAD_SUFFIXES:
         raise HTTPException(
             status_code=400,
-            detail=f"Formato no soportado: {suffix or 'sin extension'}. Usa APK, APKS o XAPK.",
+            detail=f"Unsupported format: {suffix or 'no extension'}. Use APK, APKS, or XAPK.",
         )
     settings = get_settings()
     if file.size is not None and file.size > settings.max_upload_bytes:
@@ -132,7 +132,7 @@ def upload_artifact(file: UploadFile = File(...)) -> dict[str, Any]:
         "size_bytes": file_size(target),
         "mime_type": guess_mime_type(target),
         "quarantine": True,
-        "message": "Archivo guardado en cuarentena local. Listo para analisis estatico.",
+        "message": "File saved to local quarantine and ready for static analysis.",
     }
 
 

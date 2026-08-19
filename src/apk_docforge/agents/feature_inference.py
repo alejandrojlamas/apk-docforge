@@ -41,16 +41,16 @@ class FeatureInferenceAgent(BaseAgent):
         for permission in self.context.data.get("permissions", []):
             by_category.setdefault(permission.get("category", "other"), []).append(permission)
         permission_features = {
-            "location": ("maps/ubicación", "maps_location", "Location permission indicates location or map-related capability."),
-            "camera": ("cámara", "camera", "Camera permission indicates image capture, scanning, or media feature."),
-            "microphone": ("audio/micrófono", "media", "Microphone permission indicates audio capture or voice feature."),
-            "notifications": ("notificaciones push", "notifications", "Notification permission indicates notification delivery."),
+            "location": ("maps/location", "maps_location", "Location permission indicates location or map-related capability."),
+            "camera": ("camera", "camera", "Camera permission indicates image capture, scanning, or media feature."),
+            "microphone": ("audio/microphone", "media", "Microphone permission indicates audio capture or voice feature."),
+            "notifications": ("push notifications", "notifications", "Notification permission indicates notification delivery."),
             "bluetooth": ("bluetooth/NFC", "device_connectivity", "Bluetooth permission indicates device connectivity."),
             "nfc": ("bluetooth/NFC", "device_connectivity", "NFC permission indicates device connectivity."),
-            "biometric": ("biometría", "auth", "Biometric permission indicates biometric authentication support."),
+            "biometric": ("biometrics", "auth", "Biometric permission indicates biometric authentication support."),
             "background": ("background workers", "background", "Background-related permission indicates background work."),
-            "storage": ("subida/gestión de archivos", "files", "Storage permission indicates file access or upload/download flows."),
-            "media": ("subida/gestión de archivos", "files", "Media permission indicates media access or upload/download flows."),
+            "storage": ("file upload/management", "files", "Storage permission indicates file access or upload/download flows."),
+            "media": ("file upload/management", "files", "Media permission indicates media access or upload/download flows."),
         }
         for category, (name, feature_category, description) in permission_features.items():
             if category not in by_category:
@@ -64,9 +64,9 @@ class FeatureInferenceAgent(BaseAgent):
         elements = self.context.data.get("ui_elements_static", [])
         ui_map = {
             "login_or_authenticate": ("login/auth", "auth", "Login/authentication action is visible in static UI."),
-            "register_account": ("registro", "auth", "Registration action is visible in static UI."),
-            "payment_or_subscription": ("pagos/suscripciones", "commerce", "Payment or subscription action is visible in static UI."),
-            "search": ("búsqueda", "navigation", "Search action is visible in static UI."),
+            "register_account": ("registration", "auth", "Registration action is visible in static UI."),
+            "payment_or_subscription": ("payments/subscriptions", "commerce", "Payment or subscription action is visible in static UI."),
+            "search": ("search", "navigation", "Search action is visible in static UI."),
         }
         for action, (name, category, description) in ui_map.items():
             matched = [item for item in elements if item.get("action_guess") == action]
@@ -78,9 +78,9 @@ class FeatureInferenceAgent(BaseAgent):
         elements = self.context.data.get("ui_elements_dynamic", [])
         rules = [
             ("login/auth", "auth", ["login", "sign in", "ingresar", "entrar"], "Login/auth UI observed dynamically."),
-            ("registro", "auth", ["register", "signup", "crear cuenta", "registr"], "Registration UI observed dynamically."),
-            ("pagos/suscripciones", "commerce", ["pay", "buy", "subscribe", "pagar", "comprar"], "Payment/subscription UI observed dynamically."),
-            ("búsqueda", "navigation", ["search", "buscar"], "Search UI observed dynamically."),
+            ("registration", "auth", ["register", "signup", "crear cuenta", "registr"], "Registration UI observed dynamically."),
+            ("payments/subscriptions", "commerce", ["pay", "buy", "subscribe", "pagar", "comprar"], "Payment/subscription UI observed dynamically."),
+            ("search", "navigation", ["search", "buscar"], "Search UI observed dynamically."),
         ]
         for name, category, needles, description in rules:
             evidence = []
@@ -109,11 +109,11 @@ class FeatureInferenceAgent(BaseAgent):
                 "Crashlytics SDK marker detected.",
             ),
             "Sentry": ("crash reporting", "observability", "Sentry SDK marker detected."),
-            "Google Analytics": ("analítica", "analytics", "Analytics SDK marker detected."),
-            "AdMob": ("anuncios", "ads", "Ad SDK marker detected."),
-            "Stripe": ("pagos", "commerce", "Payment SDK marker detected."),
-            "Braintree": ("pagos", "commerce", "Payment SDK marker detected."),
-            "PayPal": ("pagos", "commerce", "Payment SDK marker detected."),
+            "Google Analytics": ("analytics", "analytics", "Analytics SDK marker detected."),
+            "AdMob": ("ads", "ads", "Ad SDK marker detected."),
+            "Stripe": ("payments", "commerce", "Payment SDK marker detected."),
+            "Braintree": ("payments", "commerce", "Payment SDK marker detected."),
+            "PayPal": ("payments", "commerce", "Payment SDK marker detected."),
             "Supabase": ("backend Supabase", "backend_sdk", "Supabase marker detected."),
         }
         for sdk, (name, category, description) in sdk_features.items():
@@ -133,7 +133,7 @@ class FeatureInferenceAgent(BaseAgent):
         if "websocket" in endpoint_types:
             evidence = self._first_endpoint_evidence("websocket")
             features.append(
-                self._feature("tiempo real/WebSocket", "network", "WebSocket endpoint detected.", 0.78, evidence, ["network"])
+                self._feature("real-time/WebSocket", "network", "WebSocket endpoint detected.", 0.78, evidence, ["network"])
             )
         if "graphql" in endpoint_types:
             evidence = self._first_endpoint_evidence("graphql")
@@ -144,22 +144,22 @@ class FeatureInferenceAgent(BaseAgent):
     def _infer_from_strings(self, features: list[dict[str, Any]]) -> None:
         rules = [
             ("chat", "communication", ["chat", "message", "conversation", "mensaje"], "Messaging/chat strings detected."),
-            ("perfil", "account", ["profile", "perfil", "account", "cuenta"], "Profile/account strings detected."),
+            ("profile", "account", ["profile", "perfil", "account", "cuenta"], "Profile/account strings detected."),
             ("WebView", "webview", ["webview", "android.webkit"], "WebView class or string marker detected."),
             (
-                "base de datos local",
+                "local database",
                 "local_storage",
                 ["roomdatabase", "sqlite", "sharedpreferences", "datastore"],
                 "Local storage/database marker detected.",
             ),
             (
-                "escaneo QR/barcode",
+                "QR/barcode scanning",
                 "scanner",
                 ["barcode", "qrcode", "qr_code", "zxing", "mlkit.vision.barcode"],
                 "QR/barcode scanner marker detected.",
             ),
             (
-                "compartir contenido",
+                "content sharing",
                 "sharing",
                 ["intent.action_send", "action_send", "sharecompat", "compartir"],
                 "Content sharing marker detected.",

@@ -24,90 +24,90 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
     reconstruction_brief = data.get("reconstruction_brief", {})
     storage = _storage(features)
     lines = [
-        "# Prompt maestro para registrar ingeniería inversa Android",
+        "# Master prompt for documenting Android reverse engineering",
         "",
-        "## Rol",
+        "## Role",
         (
-            "Actúa como documentalista técnico de ingeniería inversa autorizada. Tu tarea es "
-            "convertir los JSON y artefactos de `apk-docforge` en un registro claro en lenguaje "
-            "natural: qué es la app, para qué sirve, cómo funciona, qué pantallas tiene, qué "
-            "conexiones usa, qué permisos solicita, qué riesgos aparecen y qué partes quedan unknown."
+            "Act as a technical writer for authorized reverse engineering. Your task is to "
+            "turn the JSON files and artifacts produced by `apk-docforge` into a clear natural-language "
+            "record of what the app is, what it does, how it works, which screens it has, which "
+            "connections and permissions it uses, which risks appear, and which details remain unknown."
         ),
         "",
-        "## Objetivo",
+        "## Objective",
         (
-            "Crear documentación humana de la ingeniería inversa de la aplicación analizada. "
-            "No implementes una app, no generes código de reconstrucción y no diseñes bypasses "
-            "salvo que el usuario pida explícitamente una tarea posterior permitida. Este prompt "
-            "sirve para registrar conocimiento, no para clonar ni evadir controles."
+            "Create human-readable reverse-engineering documentation for the analyzed application. "
+            "Do not implement an app, generate reconstruction code, or design bypasses unless the user "
+            "explicitly requests a permitted follow-up task. This prompt records knowledge; it is not "
+            "intended to clone the app or evade controls."
         ),
         "",
-        "## Reglas de documentación",
-        "1. Usa los JSON adjuntos como fuente de verdad.",
-        "2. No inventes funcionalidades, pantallas, endpoints ni flujos sin evidencia.",
-        "3. Separa siempre `observed`, `inferred` y `unknown`.",
-        "4. Cada afirmación importante debe incluir evidencia o indicar que es una inferencia.",
-        "5. Mantén `confidence_score` cuando exista y baja confianza cuando la evidencia sea indirecta.",
-        "6. No propongas bypasses de licencia, pago, DRM, autenticación, certificate pinning ni anti-tamper.",
-        "7. No asumas comportamiento runtime si el análisis fue estático.",
-        "8. Si hay contradicciones o datos débiles, escríbelos como limitaciones o preguntas abiertas.",
+        "## Documentation rules",
+        "1. Treat the attached JSON files as the source of truth.",
+        "2. Do not invent features, screens, endpoints, or flows without evidence.",
+        "3. Always distinguish `observed`, `inferred`, and `unknown`.",
+        "4. Every important claim must include evidence or be identified as an inference.",
+        "5. Preserve `confidence_score` when present and lower confidence for indirect evidence.",
+        "6. Do not propose bypasses for licensing, payment, DRM, authentication, certificate pinning, or anti-tamper controls.",
+        "7. Do not assume runtime behavior when the analysis was static.",
+        "8. Record contradictions or weak data as limitations or open questions.",
         "",
-        "## Formato de salida esperado",
-        "Genera un documento en lenguaje natural con esta estructura:",
-        "- Resumen ejecutivo.",
-        "- Identidad y cadena de custodia.",
-        "- Qué es la app y para qué sirve.",
-        "- Cómo funciona por dentro a nivel funcional.",
-        "- Pantallas, navegación, botones y acciones.",
-        "- Funcionalidades detectadas con evidencia.",
-        "- Conexiones, endpoints, repositorios, SDKs y clientes HTTP.",
-        "- Permisos, privacidad y datos probablemente tratados.",
-        "- Componentes Android y superficie expuesta.",
-        "- Almacenamiento local y estado offline/cache.",
-        "- Hallazgos de seguridad y controles de protección observados.",
-        "- Limitaciones, unknowns y preguntas abiertas.",
-        "- Apéndice de evidencia con rutas/JSON relevantes.",
+        "## Expected output format",
+        "Generate a natural-language document with this structure:",
+        "- Executive summary.",
+        "- Identity and chain of custody.",
+        "- What the app is and what it does.",
+        "- How it works at a functional level.",
+        "- Screens, navigation, buttons, and actions.",
+        "- Evidence-backed detected features.",
+        "- Connections, endpoints, repositories, SDKs, and HTTP clients.",
+        "- Permissions, privacy, and data likely processed.",
+        "- Android components and exposed surface.",
+        "- Local storage and offline/cache state.",
+        "- Security findings and observed protection controls.",
+        "- Limitations, unknowns, and open questions.",
+        "- Evidence appendix with relevant paths and JSON files.",
         "",
-        "## Artefactos de referencia",
-        "- `app_understanding.json`: resumen funcional normalizado.",
-        "- `source_metadata.json`: metadatos públicos o de provenance.",
-        "- `manifest.json`, `components.json`, `permissions.json`, `deep_links.json`: base Android.",
-        "- `features.json`, `feature_evidence_map.json`, `confidence_report.json`: funcionalidades.",
-        "- `static_screens.json`, `ui_elements_static.json`: pantallas y elementos estáticos.",
-        "- `network_endpoints.json`, `sdk_detection.json`, `api_clients.json`: red y SDKs.",
-        "- `security_findings.json`, `privacy_risks.json`, `control_boundary_assessment.json`: auditoría.",
-        "- `reconstruction_brief.json`: usar solo como contexto opcional si luego se pide plan de reconstrucción.",
+        "## Reference artifacts",
+        "- `app_understanding.json`: normalized functional summary.",
+        "- `source_metadata.json`: public or provenance metadata.",
+        "- `manifest.json`, `components.json`, `permissions.json`, `deep_links.json`: Android foundation.",
+        "- `features.json`, `feature_evidence_map.json`, `confidence_report.json`: features.",
+        "- `static_screens.json`, `ui_elements_static.json`: static screens and elements.",
+        "- `network_endpoints.json`, `sdk_detection.json`, `api_clients.json`: network and SDKs.",
+        "- `security_findings.json`, `privacy_risks.json`, `control_boundary_assessment.json`: audit artifacts.",
+        "- `reconstruction_brief.json`: optional context only if a reconstruction plan is requested later.",
         "",
-        "## Paquete de evidencia de esta app",
+        "## Evidence package for this app",
         "",
-        "### Identidad",
-        f"- Nombre: {identity.get('app_name') or 'unknown'}",
+        "### Identity",
+        f"- Name: {identity.get('app_name') or 'unknown'}",
         f"- Package name: {identity.get('package_name') or 'unknown'}",
         f"- Version name: {identity.get('version_name') or 'unknown'}",
         f"- Version code: {identity.get('version_code') or 'unknown'}",
         f"- Min SDK: {identity.get('min_sdk') or 'unknown'}",
         f"- Target SDK: {identity.get('target_sdk') or 'unknown'}",
-        f"- Firma/certificado: {identity.get('certificate') or 'unknown'}",
-        f"- Fuente: {identity.get('source') or 'local_file'}",
+        f"- Signature/certificate: {identity.get('certificate') or 'unknown'}",
+        f"- Source: {identity.get('source') or 'local_file'}",
         f"- SHA256: {identity.get('sha256') or 'unknown'}",
-        f"- Fecha de análisis: {identity.get('analysis_date') or 'unknown'}",
-        f"- Modo de análisis: {identity.get('mode') or 'static'}",
+        f"- Analysis date: {identity.get('analysis_date') or 'unknown'}",
+        f"- Analysis mode: {identity.get('mode') or 'static'}",
         "",
-        "### Entendimiento funcional",
-        f"- Qué es: {app_understanding.get('what_it_is') or 'unknown'}",
-        f"- Para qué sirve: {app_understanding.get('purpose') or 'unknown'}",
+        "### Functional understanding",
+        f"- What it is: {app_understanding.get('what_it_is') or 'unknown'}",
+        f"- Purpose: {app_understanding.get('purpose') or 'unknown'}",
         f"- Confidence: {app_understanding.get('confidence_score', 'unknown')}",
-        f"- Evidencia: {evidence_label(app_understanding.get('evidence_refs', []))}",
-        "- Observado directamente: consultar fuente/metadatos, pantallas, permisos y endpoints con estado `observed`.",
-        "- Inferido por nombres/código/recursos: funcionalidades y flujos con estado `inferred` y confidence_score.",
-        "- Desconocido: flujos runtime, login real, respuestas de servidor y acciones dinámicas no ejecutadas.",
+        f"- Evidence: {evidence_label(app_understanding.get('evidence_refs', []))}",
+        "- Directly observed: review sources/metadata, screens, permissions, and endpoints marked `observed`.",
+        "- Inferred from names/code/resources: features and flows marked `inferred` with a confidence score.",
+        "- Unknown: runtime flows, real login, server responses, and unexecuted dynamic actions.",
         "",
-        "### Cómo funciona la app",
+        "### How the app works",
         _how_it_works_section(app_understanding),
         "",
-        "### Flujos principales registrados",
+        "### Recorded core flows",
         md_table(
-            ["Flujo", "Descripción", "Estado", "Confidence", "Evidencia"],
+            ["Flow", "Description", "Status", "Confidence", "Evidence"],
             [
                 [
                     item.get("name"),
@@ -119,19 +119,19 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
                 for item in app_understanding.get("core_flows", [])
             ],
         ),
-        "### Modelos de datos inferidos para documentación",
+        "### Data models inferred for documentation",
         _data_models_section(reconstruction_brief),
         "",
-        "### Funcionalidades detectadas",
+        "### Detected features",
         md_table(
             [
-                "Funcionalidad",
-                "Categoría",
-                "Evidencia",
+                "Feature",
+                "Category",
+                "Evidence",
                 "Confidence",
-                "Pantallas relacionadas",
-                "Endpoints/SDKs relacionados",
-                "Riesgos/notas",
+                "Related screens",
+                "Related endpoints/SDKs",
+                "Risks/notes",
             ],
             [
                 [
@@ -146,20 +146,20 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
                 for item in features
             ],
         ),
-        "### Pantallas",
+        "### Screens",
         _screens_section(screens, ui_elements),
-        "### Pantallas dinámicas",
+        "### Dynamic screens",
         _dynamic_screens_section(screens_dynamic, ui_elements_dynamic),
-        "### Mapa de navegación",
+        "### Navigation map",
         "```mermaid",
         navigation_graph(screens, ui_elements).rstrip(),
         "```",
         "",
         _blocked_flows_section(data.get("blocked_flows", [])),
         "",
-        "### Conexiones",
+        "### Connections",
         md_table(
-            ["Dominios/Endpoints", "Método", "Cliente/Tipo", "SDKs", "Clases relacionadas", "Datos sensibles probables"],
+            ["Domains/Endpoints", "Method", "Client/Type", "SDKs", "Related classes", "Likely sensitive data"],
             [
                 [
                     item.get("url") or item.get("domain"),
@@ -172,27 +172,27 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
                 for item in endpoints
             ],
         ),
-        "### Permisos y privacidad",
+        "### Permissions and privacy",
         md_table(
-            ["Permiso", "Justificación probable", "Evidencia", "Riesgo", "Recomendación"],
+            ["Permission", "Likely justification", "Evidence", "Risk", "Recommendation"],
             [
                 [
                     item.get("name"),
                     item.get("justification_probable"),
                     evidence_label(item.get("evidence_refs", [])),
                     item.get("risk"),
-                    "Verificar necesidad y consentimiento asociado.",
+                    "Verify necessity and associated consent.",
                 ]
                 for item in permissions
             ],
         ),
-        "### Componentes Android",
+        "### Android components",
         _components_section(components),
-        "### Almacenamiento local",
+        "### Local storage",
         storage,
-        "### Hallazgos de seguridad",
+        "### Security findings",
         md_table(
-            ["Severidad", "Título", "Evidencia", "Impacto", "Recomendación", "Limitaciones"],
+            ["Severity", "Title", "Evidence", "Impact", "Recommendation", "Limitations"],
             [
                 [
                     item.get("severity"),
@@ -205,30 +205,30 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
                 for item in findings
             ],
         ),
-        "### Controles de proteccion y fronteras",
+        "### Protection controls and boundaries",
         _protection_boundaries_section(protection_controls, authorization_boundaries, bypass_policy),
-        "### Matriz de pruebas sugeridas para validar la documentación",
+        "### Suggested test matrix for validating the documentation",
         md_table(
-            ["Flujo", "Precondición", "Pasos", "Resultado esperado", "Datos de prueba", "Prioridad"],
+            ["Flow", "Precondition", "Steps", "Expected result", "Test data", "Priority"],
             _test_matrix(features, screens),
         ),
-        "### Limitaciones",
-        "- Ofuscación: ver `obfuscation_report.json`.",
-        "- Código no decompilable: depende de jadx/apktool instalados.",
-        "- Flujos detrás de login: unknown en static-only.",
-        "- Falta de credenciales de prueba: no se ejecutó login real.",
-        "- Análisis dinámico no ejecutado: esta ejecución fue exclusivamente estática.",
-        "- Cert pinning o tráfico no visible sin autorización: no se intenta bypass.",
+        "### Limitations",
+        "- Obfuscation: see `obfuscation_report.json`.",
+        "- Code that cannot be decompiled: depends on installed jadx/apktool tools.",
+        "- Flows behind login: unknown in static-only mode.",
+        "- Missing test credentials: no real login was executed.",
+        "- Dynamic analysis not executed: this run was exclusively static.",
+        "- Certificate pinning or traffic not visible without authorization: no bypass is attempted.",
         "",
-        "## Instrucciones finales para Codex",
-        "A partir de este contexto:",
-        "1. Redacta el registro de ingeniería inversa en lenguaje natural.",
-        "2. Empieza por una explicación entendible para humanos y luego baja al detalle técnico.",
-        "3. No inventes funcionalidades sin evidencia.",
-        "4. No conviertas esto en una especificación para clonar la app salvo que el usuario lo pida después.",
-        "5. Conserva evidencia, confidence y estado observed/inferred/unknown.",
-        "6. Usa `unknown` cuando falte evidencia.",
-        "7. No propongas bypasses de licencia, pago, DRM, autenticación ni controles de seguridad.",
+        "## Final instructions for Codex",
+        "Using this context:",
+        "1. Write the reverse-engineering record in natural language.",
+        "2. Begin with a human-readable explanation, then move into technical detail.",
+        "3. Do not invent features without evidence.",
+        "4. Do not turn this into a specification for cloning the app unless the user requests that later.",
+        "5. Preserve evidence, confidence, and observed/inferred/unknown status.",
+        "6. Use `unknown` whenever evidence is missing.",
+        "7. Do not propose bypasses for licensing, payment, DRM, authentication, or security controls.",
         "",
     ]
     return "\n".join(lines).replace("\n\n\n", "\n\n")
@@ -236,7 +236,7 @@ def render_codex_prompt(data: dict[str, Any]) -> str:
 
 def _screens_section(screens: list[dict[str, Any]], elements: list[dict[str, Any]]) -> str:
     if not screens:
-        return "_No hay pantallas observadas._\n"
+        return "_No observed screens._\n"
     lines = []
     for screen in screens:
         related = [item for item in elements if item.get("screen_hint") == screen.get("name")]
@@ -245,15 +245,15 @@ def _screens_section(screens: list[dict[str, Any]], elements: list[dict[str, Any
         lines.extend(
             [
                 f"### {screen.get('name')}",
-                f"- Nombre probable: {screen.get('name')}",
-                f"- Activity/Fragment/Composable/layout relacionado: {screen.get('activity_or_fragment') or ', '.join(screen.get('related_layouts', [])) or 'unknown'}",
-                f"- Elementos UI: {len(related)}",
-                f"- Botones: {', '.join(_element_label(item) for item in buttons) or 'unknown'}",
+                f"- Likely name: {screen.get('name')}",
+                f"- Related Activity/Fragment/Composable/layout: {screen.get('activity_or_fragment') or ', '.join(screen.get('related_layouts', [])) or 'unknown'}",
+                f"- UI elements: {len(related)}",
+                f"- Buttons: {', '.join(_element_label(item) for item in buttons) or 'unknown'}",
                 f"- Inputs: {', '.join(_element_label(item) for item in inputs) or 'unknown'}",
-                "- Menús: consultar `ui_elements_static.json`.",
-                "- Acciones esperadas: inferidas por texto/recurso cuando existe.",
-                "- Acciones observadas: unknown en modo static-only.",
-                f"- Evidencia: {evidence_label(screen.get('evidence_refs', []))}",
+                "- Menus: see `ui_elements_static.json`.",
+                "- Expected actions: inferred from text/resources when available.",
+                "- Observed actions: unknown in static-only mode.",
+                f"- Evidence: {evidence_label(screen.get('evidence_refs', []))}",
                 "",
             ]
         )
@@ -288,7 +288,7 @@ def _components_section(components: dict[str, list[dict[str, Any]]]) -> str:
 
 def _dynamic_screens_section(screens: list[dict[str, Any]], elements: list[dict[str, Any]]) -> str:
     if not screens:
-        return "_No hay pantallas dinámicas observadas._\n"
+        return "_No observed dynamic screens._\n"
     lines = []
     for screen in screens:
         related = [item for item in elements if item.get("screen_id") == screen.get("id")]
@@ -296,12 +296,12 @@ def _dynamic_screens_section(screens: list[dict[str, Any]], elements: list[dict[
         lines.extend(
             [
                 f"### {screen.get('name')}",
-                "- Fuente: UIAutomator dinámico",
+                "- Source: dynamic UIAutomator capture",
                 f"- Screenshot: {screen.get('screenshot') or 'unknown'}",
                 f"- UI dump: {screen.get('uiautomator_dump') or 'unknown'}",
-                f"- Elementos: {len(related)}",
-                f"- Acciones observadas: {', '.join(_element_label(item) for item in buttons[:8]) or 'unknown'}",
-                f"- Evidencia: {evidence_label(screen.get('evidence_refs', []))}",
+                f"- Elements: {len(related)}",
+                f"- Observed actions: {', '.join(_element_label(item) for item in buttons[:8]) or 'unknown'}",
+                f"- Evidence: {evidence_label(screen.get('evidence_refs', []))}",
                 "",
             ]
         )
@@ -314,13 +314,13 @@ def _reconstruction_goal_section(
     source_metadata: dict[str, Any],
 ) -> str:
     lines = [
-        f"- Meta principal: {brief.get('codex_goal') or understanding.get('what_it_is') or 'unknown'}",
-        f"- Fuente pública/permitida: {source_metadata.get('package_page_url') or source_metadata.get('metadata_source') or source_metadata.get('source') or 'unknown'}",
-        f"- App base: {understanding.get('app_name') or source_metadata.get('app_name') or 'unknown'}",
-        f"- Usuarios: {', '.join(understanding.get('primary_users', [])) or 'unknown'}",
+        f"- Primary goal: {brief.get('codex_goal') or understanding.get('what_it_is') or 'unknown'}",
+        f"- Public/approved source: {source_metadata.get('package_page_url') or source_metadata.get('metadata_source') or source_metadata.get('source') or 'unknown'}",
+        f"- Base app: {understanding.get('app_name') or source_metadata.get('app_name') or 'unknown'}",
+        f"- Users: {', '.join(understanding.get('primary_users', [])) or 'unknown'}",
         f"- Evidence refs: {evidence_label(brief.get('evidence_refs') or understanding.get('evidence_refs', []))}",
         "",
-        "### Pantallas base para rehacer",
+        "### Baseline screens to recreate",
     ]
     screens = brief.get("screen_blueprint", [])
     if not screens:
@@ -336,7 +336,7 @@ def _how_it_works_section(understanding: dict[str, Any]) -> str:
         return "- unknown\n"
     return "\n".join(
         f"- {item.get('step')}: status={item.get('status')}, confidence={item.get('confidence_score')}, "
-        f"evidencia={evidence_label(item.get('evidence_refs', []))}"
+        f"evidence={evidence_label(item.get('evidence_refs', []))}"
         for item in rows
     )
 
@@ -359,16 +359,16 @@ def _reconstruction_backlog(brief: dict[str, Any]) -> str:
     items = brief.get("recommended_mvp_scope", [])
     if not items:
         return ""
-    rows = ["- Épicas de reconstrucción:"]
+    rows = ["- Reconstruction epics:"]
     rows.extend(f"  - {item}" for item in items[:8])
     return "\n".join(rows)
 
 
 def _blocked_flows_section(blocked_flows: list[dict[str, Any]]) -> str:
     if not blocked_flows:
-        return "- Flujos bloqueados: unknown o no observados."
+        return "- Blocked flows: unknown or not observed."
     rows = [
-        f"- Flujos bloqueados: {item.get('type')} / {item.get('label')} / {item.get('reason')}"
+        f"- Blocked flows: {item.get('type')} / {item.get('label')} / {item.get('reason')}"
         for item in blocked_flows
     ]
     return "\n".join(rows)
@@ -382,8 +382,8 @@ def _storage(features: list[dict[str, Any]]) -> str:
             f"- SharedPreferences: {status}",
             f"- SQLite/Room: {status}",
             "- Files/cache: unknown",
-            "- Encrypted storage si se detecta: unknown",
-            "- Riesgos: revisar hallazgos de almacenamiento y evidencia antes de afirmar datos sensibles.",
+            "- Encrypted storage when detected: unknown",
+            "- Risks: review storage findings and evidence before asserting that sensitive data is present.",
             "",
         ]
     )
@@ -396,13 +396,13 @@ def _protection_boundaries_section(
 ) -> str:
     observed = [item for item in controls if item.get("status") != "unknown"]
     lines = [
-        f"- Bypass implementado: {str(policy.get('bypass_implemented', False)).lower()}",
-        f"- Bypass intentado: {str(policy.get('bypass_attempted', False)).lower()}",
-        f"- Politica: {policy.get('reason') or 'Los controles se documentan sin evadirlos.'}",
+        f"- Bypass implemented: {str(policy.get('bypass_implemented', False)).lower()}",
+        f"- Bypass attempted: {str(policy.get('bypass_attempted', False)).lower()}",
+        f"- Policy: {policy.get('reason') or 'Controls are documented without evasion.'}",
         "",
-        "### Controles detectados",
+        "### Detected controls",
         md_table(
-            ["Control", "Categoria", "Estado", "Bypass", "Confidence", "Evidencia"],
+            ["Control", "Category", "Status", "Bypass", "Confidence", "Evidence"],
             [
                 [
                     item.get("name"),
@@ -415,9 +415,9 @@ def _protection_boundaries_section(
                 for item in observed
             ],
         ),
-        "### Fronteras de autorizacion",
+        "### Authorization boundaries",
         md_table(
-            ["Frontera", "Categoria", "Accion permitida", "Accion bloqueada", "Confidence", "Evidencia"],
+            ["Boundary", "Category", "Allowed action", "Blocked action", "Confidence", "Evidence"],
             [
                 [
                     item.get("name"),
@@ -439,23 +439,23 @@ def _test_matrix(features: list[dict[str, Any]], screens: list[dict[str, Any]]) 
     for screen in screens[:8]:
         rows.append(
             [
-                f"Pantalla {screen.get('name')}",
-                "APK instalada en emulador de pruebas autorizado",
-                "Abrir app, navegar a la pantalla, registrar elementos visibles",
-                "La pantalla muestra elementos esperados y no genera errores",
-                "Datos de prueba no sensibles",
-                "Media",
+                f"Screen {screen.get('name')}",
+                "APK installed in an authorized test emulator",
+                "Open the app, navigate to the screen, and record visible elements",
+                "The screen shows expected elements without errors",
+                "Non-sensitive test data",
+                "Medium",
             ]
         )
     for feature in features[:8]:
         rows.append(
             [
                 str(feature.get("name")),
-                "Evidencia estática revisada",
-                "Validar flujo en entorno de prueba sin acciones irreversibles",
-                "El comportamiento coincide con la evidencia documentada",
-                "Cuenta o datos de prueba si aplica",
-                "Alta" if feature.get("category") in {"auth", "commerce"} else "Media",
+                "Static evidence reviewed",
+                "Validate the flow in a test environment without irreversible actions",
+                "Behavior matches the documented evidence",
+                "Test account or data when applicable",
+                "High" if feature.get("category") in {"auth", "commerce"} else "Medium",
             ]
         )
     return rows

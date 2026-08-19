@@ -56,18 +56,18 @@ class DocumentationAgent(BaseAgent):
 
     def _write_docs(self, data: dict[str, Any], llm_metadata: dict[str, Any]) -> None:
         docs = {
-            "00_resumen_ejecutivo.md": self._executive_summary(data, llm_metadata),
-            "01_identidad_app.md": self._identity_doc(data),
-            "02_mapa_funcional.md": self._features_doc(data),
-            "02b_brief_reconstruccion_codex.md": self._reconstruction_doc(data),
-            "03_pantallas_y_botones.md": self._screens_doc(data),
-            "04_conexiones_y_sdks.md": self._connections_doc(data),
-            "05_permisos_privacidad.md": self._permissions_doc(data),
-            "06_hallazgos_seguridad.md": self._security_doc(data),
-            "06b_controles_y_fronteras.md": self._control_boundaries_doc(data),
-            "07_matriz_pruebas.md": self._test_matrix_doc(data),
-            "08_backlog_recomendado.md": self._backlog_doc(data),
-            "09_limitaciones.md": self._limitations_doc(data, llm_metadata),
+            "00_executive_summary.md": self._executive_summary(data, llm_metadata),
+            "01_app_identity.md": self._identity_doc(data),
+            "02_feature_map.md": self._features_doc(data),
+            "02b_codex_reconstruction_brief.md": self._reconstruction_doc(data),
+            "03_screens_and_buttons.md": self._screens_doc(data),
+            "04_connections_and_sdks.md": self._connections_doc(data),
+            "05_permissions_and_privacy.md": self._permissions_doc(data),
+            "06_security_findings.md": self._security_doc(data),
+            "06b_controls_and_boundaries.md": self._control_boundaries_doc(data),
+            "07_test_matrix.md": self._test_matrix_doc(data),
+            "08_recommended_backlog.md": self._backlog_doc(data),
+            "09_limitations.md": self._limitations_doc(data, llm_metadata),
         }
         for filename, body in docs.items():
             title = Path(filename).stem.replace("_", " ").title()
@@ -103,10 +103,10 @@ class DocumentationAgent(BaseAgent):
             [
                 f"- App: {identity.get('app_name') or identity.get('package_name') or 'unknown'}",
                 f"- Package: {identity.get('package_name') or 'unknown'}",
-                f"- Qué es: {understanding.get('what_it_is') or 'unknown'}",
-                f"- Para qué sirve: {understanding.get('purpose') or 'unknown'}",
-                f"- Objetivo para Codex: {reconstruction.get('codex_goal') or 'unknown'}",
-                f"- Flujos principales: {', '.join(item.get('name', 'unknown') for item in flows[:8]) or 'unknown'}",
+                f"- What it is: {understanding.get('what_it_is') or 'unknown'}",
+                f"- Purpose: {understanding.get('purpose') or 'unknown'}",
+                f"- Codex objective: {reconstruction.get('codex_goal') or 'unknown'}",
+                f"- Core flows: {', '.join(item.get('name', 'unknown') for item in flows[:8]) or 'unknown'}",
                 f"- Analysis mode: {identity.get('mode') or 'static'}",
                 f"- Features inferred: {len(data.get('features', []))}",
                 f"- Screens mapped: {len(data.get('screens', []))}",
@@ -127,11 +127,11 @@ class DocumentationAgent(BaseAgent):
         if understanding:
             rows.extend(
                 [
-                    f"- Qué es: {understanding.get('what_it_is') or 'unknown'}",
-                    f"- Para qué sirve: {understanding.get('purpose') or 'unknown'}",
+                    f"- What it is: {understanding.get('what_it_is') or 'unknown'}",
+                    f"- Purpose: {understanding.get('purpose') or 'unknown'}",
                     f"- Confidence: {understanding.get('confidence_score', 'unknown')}",
                     "",
-                    "## Flujos principales",
+                    "## Core flows",
                 ]
             )
             flows = understanding.get("core_flows", [])
@@ -142,9 +142,9 @@ class DocumentationAgent(BaseAgent):
             )
             rows.append("")
         if not data.get("features"):
-            rows.append("No se detectaron funcionalidades técnicas adicionales con evidencia suficiente.")
+            rows.append("No additional technical features were detected with sufficient evidence.")
             return "\n".join(rows)
-        rows.append("## Señales técnicas")
+        rows.append("## Technical signals")
         rows.extend(
             f"- {item['name']} ({item['category']}): {item['description']} "
             f"confidence={item.get('confidence_score', item.get('confidence'))}"
@@ -155,27 +155,27 @@ class DocumentationAgent(BaseAgent):
     def _reconstruction_doc(self, data: dict[str, Any]) -> str:
         brief = data.get("reconstruction_brief", {})
         if not brief:
-            return "No se genero brief de reconstruccion."
+            return "No reconstruction brief was generated."
         rows = [
-            f"- Objetivo Codex: {brief.get('codex_goal') or 'unknown'}",
+            f"- Codex objective: {brief.get('codex_goal') or 'unknown'}",
             "",
-            "## Alcance MVP recomendado",
+            "## Recommended MVP scope",
         ]
         rows.extend(f"- {item}" for item in brief.get("recommended_mvp_scope", []))
-        rows.extend(["", "## Pantallas a reconstruir"])
+        rows.extend(["", "## Screens to reconstruct"])
         rows.extend(
             f"- {item.get('name')}: {item.get('description')}"
             for item in brief.get("screen_blueprint", [])
         )
-        rows.extend(["", "## Modelos de datos"])
+        rows.extend(["", "## Data models"])
         rows.extend(f"- {item}" for item in brief.get("core_data_models", []))
-        rows.extend(["", "## Fuera de alcance"])
+        rows.extend(["", "## Out of scope"])
         rows.extend(f"- {item}" for item in brief.get("out_of_scope", []))
         return "\n".join(rows)
 
     def _screens_doc(self, data: dict[str, Any]) -> str:
         if not data.get("screens"):
-            return "No se mapearon pantallas estáticas."
+            return "No static screens were mapped."
         return "\n".join(
             f"- {item['name']}: source={item.get('source')}, elements={item.get('ui_element_count', 0)}, "
             f"confidence={item.get('confidence')}"
@@ -185,7 +185,7 @@ class DocumentationAgent(BaseAgent):
     def _connections_doc(self, data: dict[str, Any]) -> str:
         endpoints = data.get("endpoints", [])
         if not endpoints:
-            return "No se detectaron dominios o endpoints en cadenas estáticas."
+            return "No domains or endpoints were detected in static strings."
         return "\n".join(
             f"- {item.get('url') or item.get('domain')}: type={item.get('type')}, confidence={item.get('confidence')}"
             for item in endpoints[:100]
@@ -193,7 +193,7 @@ class DocumentationAgent(BaseAgent):
 
     def _permissions_doc(self, data: dict[str, Any]) -> str:
         if not data.get("permissions"):
-            return "No se observaron permisos en el manifiesto o el manifiesto no fue parseable."
+            return "No permissions were observed in the manifest, or the manifest was not parseable."
         return "\n".join(
             f"- {item['name']}: risk={item['risk']}, justification={item['justification_probable']}"
             for item in data["permissions"]
@@ -201,7 +201,7 @@ class DocumentationAgent(BaseAgent):
 
     def _security_doc(self, data: dict[str, Any]) -> str:
         if not data.get("findings"):
-            return "No se generaron hallazgos de seguridad con evidencia en el análisis estático."
+            return "No evidence-backed security findings were generated by static analysis."
         return "\n".join(
             f"- [{item['severity']}] {item['title']}: {item['recommendation']}"
             for item in data["findings"]
@@ -212,28 +212,28 @@ class DocumentationAgent(BaseAgent):
         boundaries = data.get("authorization_boundaries", [])
         policy = data.get("bypass_policy", {})
         rows = [
-            "- Bypass implementado: false",
-            "- Bypass intentado: false",
-            f"- Politica: {policy.get('reason') or 'Los controles se documentan sin evadirlos.'}",
+            "- Bypass implemented: false",
+            "- Bypass attempted: false",
+            f"- Policy: {policy.get('reason') or 'Controls are documented without bypassing them.'}",
             "",
-            "## Controles detectados",
+            "## Detected controls",
         ]
         observed = [item for item in controls if item.get("status") != "unknown"]
         if not observed:
-            rows.append("- No se detectaron controles de proteccion con evidencia estatica suficiente.")
+            rows.append("- No protection controls were detected with sufficient static evidence.")
         else:
             rows.extend(
                 f"- {item['name']} ({item['status']}): {item['recommendation']} "
                 f"confidence={item.get('confidence_score', item.get('confidence'))}"
                 for item in observed
             )
-        rows.extend(["", "## Fronteras de autorizacion"])
+        rows.extend(["", "## Authorization boundaries"])
         if not boundaries:
-            rows.append("- No se observaron fronteras adicionales con evidencia.")
+            rows.append("- No additional evidence-backed boundaries were observed.")
         else:
             rows.extend(
-                f"- {item['name']}: accion permitida={item['allowed_audit_action']}; "
-                f"accion bloqueada={item['blocked_action']}"
+                f"- {item['name']}: allowed action={item['allowed_audit_action']}; "
+                f"blocked action={item['blocked_action']}"
                 for item in boundaries
             )
         return "\n".join(rows)
@@ -241,33 +241,37 @@ class DocumentationAgent(BaseAgent):
     def _test_matrix_doc(self, data: dict[str, Any]) -> str:
         rows = []
         for screen in data.get("screens", [])[:10]:
-            rows.append(f"- Pantalla {screen['name']}: validar render y acciones no destructivas en emulador.")
+            rows.append(
+                f"- Screen {screen['name']}: validate rendering and non-destructive actions in an emulator."
+            )
         for feature in data.get("features", [])[:10]:
-            rows.append(f"- Funcionalidad {feature['name']}: validar flujo con datos de prueba.")
-        return "\n".join(rows) if rows else "No hay matriz de pruebas sugerida por falta de evidencia."
+            rows.append(f"- Feature {feature['name']}: validate the flow with test data.")
+        return "\n".join(rows) if rows else "No test matrix is suggested because evidence is insufficient."
 
     def _backlog_doc(self, data: dict[str, Any]) -> str:
         rows = [
-            "- Completar análisis dinámico autorizado para pantallas y navegación.",
-            "- Revisar hallazgos medium/high antes de distribución.",
-            "- Documentar justificación de permisos sensibles.",
-            "- Validar endpoints activos y clasificación de datos transmitidos.",
+            "- Complete authorized dynamic analysis for screens and navigation.",
+            "- Review medium/high findings before distribution.",
+            "- Document justification for sensitive permissions.",
+            "- Validate active endpoints and classify transmitted data.",
         ]
         if not data.get("features"):
-            rows.append("- Repetir análisis con jadx/apktool instalados para mejorar inferencia de funcionalidades.")
+            rows.append(
+                "- Repeat analysis with jadx/apktool installed to improve feature inference."
+            )
         return "\n".join(rows)
 
     def _limitations_doc(self, data: dict[str, Any], llm_metadata: dict[str, Any]) -> str:
         rows = [
-            "- Fase 1 es static-only.",
-            "- No se ejecuta APK ni navegación dinámica.",
-            "- No se hacen bypasses de pinning, login, pagos, DRM, licencias ni anti-tamper.",
-            "- Los flujos detrás de login quedan unknown.",
-            f"- DeepSeek: {llm_metadata.get('status')} ({llm_metadata.get('error') or 'sin error'}).",
+            "- Phase 1 is static-only.",
+            "- The APK and dynamic navigation are not executed.",
+            "- Pinning, login, payment, DRM, license, and anti-tamper controls are not bypassed.",
+            "- Login-gated flows remain unknown.",
+            f"- DeepSeek: {llm_metadata.get('status')} ({llm_metadata.get('error') or 'no error'}).",
         ]
         missing = [name for name, meta in data.get("tools", {}).items() if not meta.get("available")]
         if missing:
-            rows.append(f"- Herramientas faltantes: {', '.join(missing)}.")
+            rows.append(f"- Missing tools: {', '.join(missing)}.")
         return "\n".join(rows)
 
 

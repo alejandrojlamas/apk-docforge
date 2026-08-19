@@ -37,7 +37,10 @@ def test_api_analysis_read_endpoints(sample_apk, tmp_path, isolated_app_env) -> 
 
     prompt = client.get(f"/api/analyses/{analysis_id}/codex-prompt")
     assert prompt.status_code == 200
-    assert "# Prompt maestro para registrar ingeniería inversa Android" in prompt.json()["codex_prompt"]
+    assert (
+        "# Master prompt for documenting Android reverse engineering"
+        in prompt.json()["codex_prompt"]
+    )
 
     features = client.get(f"/api/analyses/{analysis_id}/features")
     assert features.status_code == 200
@@ -85,7 +88,7 @@ def test_api_upload_and_settings(sample_apk, isolated_app_env) -> None:
 
     home = client.get("/")
     assert home.status_code == 200
-    assert "Elige como traer la app" in home.text
+    assert "Choose how to provide the app" in home.text
 
     with sample_apk.open("rb") as handle:
         upload = client.post(

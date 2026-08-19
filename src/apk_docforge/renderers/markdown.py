@@ -9,7 +9,7 @@ from apk_docforge.renderers.mermaid import navigation_graph
 
 def md_table(headers: list[str], rows: list[list[Any]]) -> str:
     if not rows:
-        return "_No hay datos observados._\n"
+        return "_No observed data._\n"
     header = "| " + " | ".join(headers) + " |"
     separator = "| " + " | ".join("---" for _ in headers) + " |"
     body = ["| " + " | ".join(_cell(cell) for cell in row) + " |" for row in rows]
@@ -47,11 +47,11 @@ def render_report(data: dict[str, Any]) -> str:
                 ["Mode", identity.get("mode") or "unknown"],
             ],
         ),
-        "## Que Es Y Como Funciona",
+        "## What It Is And How It Works",
         "",
         _app_understanding_section(app_understanding, source_metadata),
         "",
-        "## Brief Para Rehacer En Codex",
+        "## Codex Reconstruction Brief",
         "",
         _reconstruction_brief_section(reconstruction_brief),
         "",
@@ -204,18 +204,18 @@ def _app_understanding_section(
     understanding: dict[str, Any], source_metadata: dict[str, Any]
 ) -> str:
     if not understanding:
-        return "- Qué es: unknown\n- Para qué sirve: unknown\n- Cómo funciona: unknown\n"
+        return "- What it is: unknown\n- Purpose: unknown\n- How it works: unknown\n"
     how = understanding.get("how_it_works", [])
     flows = understanding.get("core_flows", [])
     lines = [
-        f"- Qué es: {understanding.get('what_it_is') or 'unknown'}",
-        f"- Para qué sirve: {understanding.get('purpose') or 'unknown'}",
-        f"- Usuarios principales: {', '.join(understanding.get('primary_users', [])) or 'unknown'}",
-        f"- Fuente de metadatos: {source_metadata.get('package_page_url') or source_metadata.get('metadata_source') or source_metadata.get('source') or 'unknown'}",
+        f"- What it is: {understanding.get('what_it_is') or 'unknown'}",
+        f"- Purpose: {understanding.get('purpose') or 'unknown'}",
+        f"- Primary users: {', '.join(understanding.get('primary_users', [])) or 'unknown'}",
+        f"- Metadata source: {source_metadata.get('package_page_url') or source_metadata.get('metadata_source') or source_metadata.get('source') or 'unknown'}",
         f"- Confidence: {understanding.get('confidence_score', 'unknown')}",
-        f"- Evidencia: {evidence_label(understanding.get('evidence_refs', []))}",
+        f"- Evidence: {evidence_label(understanding.get('evidence_refs', []))}",
         "",
-        "### Como funciona",
+        "### How it works",
     ]
     if how:
         lines.extend(
@@ -224,11 +224,11 @@ def _app_understanding_section(
         )
     else:
         lines.append("- unknown")
-    lines.extend(["", "### Flujos principales"])
+    lines.extend(["", "### Core flows"])
     if flows:
         lines.append(
             md_table(
-                ["Flujo", "Descripcion", "Estado", "Confidence", "Evidencia"],
+                ["Flow", "Description", "Status", "Confidence", "Evidence"],
                 [
                     [
                         item.get("name"),
@@ -252,20 +252,20 @@ def _app_understanding_section(
 
 def _reconstruction_brief_section(brief: dict[str, Any]) -> str:
     if not brief:
-        return "- Objetivo Codex: unknown\n"
+        return "- Codex objective: unknown\n"
     lines = [
-        f"- Objetivo Codex: {brief.get('codex_goal') or 'unknown'}",
-        f"- Evidencia: {evidence_label(brief.get('evidence_refs', []))}",
+        f"- Codex objective: {brief.get('codex_goal') or 'unknown'}",
+        f"- Evidence: {evidence_label(brief.get('evidence_refs', []))}",
         "",
-        "### Alcance MVP recomendado",
+        "### Recommended MVP scope",
     ]
     lines.extend(f"- {item}" for item in brief.get("recommended_mvp_scope", [])[:12])
-    lines.extend(["", "### Pantallas sugeridas"])
+    lines.extend(["", "### Suggested screens"])
     screens = brief.get("screen_blueprint", [])
     if screens:
         lines.append(
             md_table(
-                ["Pantalla", "Descripcion", "Source", "Confidence"],
+                ["Screen", "Description", "Source", "Confidence"],
                 [
                     [
                         item.get("name"),
@@ -279,9 +279,9 @@ def _reconstruction_brief_section(brief: dict[str, Any]) -> str:
         )
     else:
         lines.append("- unknown")
-    lines.extend(["", "### Modelos de datos"])
+    lines.extend(["", "### Data models"])
     lines.extend(f"- {item}" for item in brief.get("core_data_models", [])[:20])
-    lines.extend(["", "### Fuera de alcance"])
+    lines.extend(["", "### Out of scope"])
     lines.extend(f"- {item}" for item in brief.get("out_of_scope", [])[:10])
     return "\n".join(lines)
 

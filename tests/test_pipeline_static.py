@@ -22,7 +22,7 @@ def test_static_pipeline_generates_outputs(sample_apk, tmp_path, isolated_app_en
 
     features = json.loads((out / "features.json").read_text())
     assert any(item["name"] == "login/auth" for item in features["features"])
-    assert any(item["name"] == "pagos/suscripciones" for item in features["features"])
+    assert any(item["name"] == "payments/subscriptions" for item in features["features"])
 
     qa = json.loads((out / "qa_report.json").read_text())
     assert qa["status"] == "passed"
@@ -37,7 +37,21 @@ def test_static_pipeline_generates_outputs(sample_apk, tmp_path, isolated_app_en
     assert "authentication_gate" in observed_controls
     assert "certificate_pinning" in observed_controls
     assert all(item["bypass_allowed"] is False for item in boundaries["controls"])
-    assert (out / "docs" / "06b_controles_y_fronteras.md").exists()
+    expected_docs = {
+        "00_executive_summary.md",
+        "01_app_identity.md",
+        "02_feature_map.md",
+        "02b_codex_reconstruction_brief.md",
+        "03_screens_and_buttons.md",
+        "04_connections_and_sdks.md",
+        "05_permissions_and_privacy.md",
+        "06_security_findings.md",
+        "06b_controls_and_boundaries.md",
+        "07_test_matrix.md",
+        "08_recommended_backlog.md",
+        "09_limitations.md",
+    }
+    assert {path.name for path in (out / "docs").glob("*.md")} == expected_docs
 
     prompt = (out / "codex_ingestion_prompt.md").read_text(encoding="utf-8")
     report = (out / "report.md").read_text(encoding="utf-8")
@@ -45,11 +59,11 @@ def test_static_pipeline_generates_outputs(sample_apk, tmp_path, isolated_app_en
     reconstruction = json.loads((out / "reconstruction_brief.json").read_text())
     assert understanding["what_it_is"]
     assert reconstruction["codex_goal"]
-    assert "## Que Es Y Como Funciona" in report
-    assert "# Prompt maestro para registrar ingeniería inversa Android" in prompt
-    assert "Redacta el registro de ingeniería inversa en lenguaje natural" in prompt
-    assert "### Controles de proteccion y fronteras" in prompt
-    assert "Bypass implementado: false" in prompt
+    assert "## What It Is And How It Works" in report
+    assert "# Master prompt for documenting Android reverse engineering" in prompt
+    assert "Write the reverse-engineering record in natural language" in prompt
+    assert "### Protection controls and boundaries" in prompt
+    assert "Bypass implemented: false" in prompt
 
 
 def test_static_pipeline_preserves_original_container_type(sample_apk, tmp_path, isolated_app_env) -> None:
