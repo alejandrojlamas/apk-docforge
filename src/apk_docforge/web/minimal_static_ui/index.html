@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>apk-docforge</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Saltar al contenido</a>
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M7 6.5h10a3 3 0 0 1 3 3V17a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V9.5a3 3 0 0 1 3-3Z" />
+            <path d="m8.5 4 1.2 2.5M15.5 4l-1.2 2.5M8.5 12h.01M15.5 12h.01" />
+          </svg>
+        </div>
+        <div>
+          <p class="app-name">apk-docforge</p>
+          <p class="app-subtitle">Documentacion local de apps Android</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="healthBadge" class="status-pill">Revisando servidor</span>
+        <button class="icon-button" type="button" data-jump="#settingsPanel" aria-label="Abrir ajustes">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2 3.4-.2-.1a1.7 1.7 0 0 0-1.9-.1 8 8 0 0 1-1.5.6 1.7 1.7 0 0 0-1.2 1.6v.1H9v-.1a1.7 1.7 0 0 0-1.2-1.6 8 8 0 0 1-1.5-.6 1.7 1.7 0 0 0-1.9.1l-.2.1-2-3.4.1-.1A1.7 1.7 0 0 0 2.6 15 7.5 7.5 0 0 1 2.5 12c0-.5 0-1 .1-1.5a1.7 1.7 0 0 0-.3-1.9l-.1-.1 2-3.4.2.1a1.7 1.7 0 0 0 1.9.1c.5-.3 1-.5 1.5-.6A1.7 1.7 0 0 0 9 3.1V3h4v.1a1.7 1.7 0 0 0 1.2 1.6c.5.1 1 .3 1.5.6a1.7 1.7 0 0 0 1.9-.1l.2-.1 2 3.4-.1.1a1.7 1.7 0 0 0-.3 1.9c.1.5.1 1 .1 1.5s0 1-.1 1.5Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-shell">
+      <aside class="step-rail" aria-label="Progreso del flujo">
+        <p class="rail-title">Flujo guiado</p>
+        <ol id="progressSteps" class="progress-list">
+          <li data-step="source"><span></span>Entrada</li>
+          <li data-step="download"><span></span>Descarga o carga</li>
+          <li data-step="quarantine"><span></span>Hash y cuarentena</li>
+          <li data-step="analysis"><span></span>Analisis</li>
+          <li data-step="report"><span></span>Reporte</li>
+        </ol>
+        <div class="policy-box">
+          <p class="policy-title">Politica activa</p>
+          <p>No se hacen bypasses, no se scrapea Google Play y los mirrors de terceros quedan bloqueados por defecto.</p>
+        </div>
+      </aside>
+
+      <main id="main" class="main-grid">
+        <section class="flow-panel" aria-labelledby="startTitle">
+          <div class="section-head">
+            <div>
+              <h1 id="startTitle">Elige como traer la app</h1>
+              <p>Sube una APK, busca en fuentes permitidas o importa desde un dispositivo de pruebas.</p>
+            </div>
+            <button id="refreshAnalyses" class="secondary-button" type="button">Actualizar reportes</button>
+          </div>
+
+          <div class="mode-grid" role="tablist" aria-label="Formas de entrada">
+            <button class="mode-card is-active" type="button" data-panel="uploadPanel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0 4 4m-4-4-4 4M5 16v3h14v-3" /></svg>
+              <span>Subir archivo</span>
+              <small>APK, APKS o XAPK local</small>
+            </button>
+            <button class="mode-card" type="button" data-panel="searchPanel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" /></svg>
+              <span>Buscar app</span>
+              <small>Fuentes publicas permitidas</small>
+            </button>
+            <button class="mode-card" type="button" data-panel="devicePanel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm2 15h4" /></svg>
+              <span>Importar dispositivo</span>
+              <small>ADB en emulador o test device</small>
+            </button>
+          </div>
+
+          <div id="uploadPanel" class="entry-panel is-active">
+            <form id="uploadForm" class="stack">
+              <label id="dropZone" class="drop-zone" for="apkFile">
+                <input id="apkFile" name="file" type="file" accept=".apk,.apks,.xapk" />
+                <span class="drop-title">Arrastra aqui tu APK o selecciona un archivo</span>
+                <span class="drop-help">Se guarda primero en cuarentena local y se calcula SHA256 antes del analisis.</span>
+                <span id="selectedFile" class="file-name">Ningun archivo seleccionado</span>
+              </label>
+
+              <div class="field-row">
+                <label>
+                  Ruta local alternativa
+                  <input id="localPath" type="text" placeholder="/path/to/app.apk" autocomplete="off" />
+                </label>
+              </div>
+
+              <div class="option-row" role="radiogroup" aria-label="Modo de analisis">
+                <label><input type="radio" name="mode" value="static" checked /> Analisis estatico</label>
+                <label><input type="radio" name="mode" value="dynamic" /> Dinamico controlado</label>
+              </div>
+
+              <div class="field-row">
+                <label>
+                  Dispositivo ADB para modo dinamico
+                  <input id="uploadDevice" type="text" placeholder="emulator-5554" autocomplete="off" />
+                </label>
+              </div>
+
+              <button class="primary-button" type="submit">Subir y generar documentacion</button>
+            </form>
+          </div>
+
+          <div id="searchPanel" class="entry-panel">
+            <form id="searchForm" class="stack">
+              <label>
+                Nombre, package name, repositorio o URL oficial
+                <input id="searchQuery" type="search" placeholder="org.example.app, NewPipe o https://oficial.com/app.apk" required />
+              </label>
+
+              <fieldset class="source-grid">
+                <legend>Fuentes de busqueda</legend>
+                <label><input type="checkbox" name="source" value="fdroid" checked /> F-Droid</label>
+                <label><input type="checkbox" name="source" value="github" checked /> GitHub Releases</label>
+                <label><input type="checkbox" name="source" value="official" /> URL oficial allowlist</label>
+                <label><input type="checkbox" name="source" value="google_play_developer" /> Google Play Developer</label>
+                <label class="disabled-source"><input type="checkbox" disabled /> Mirrors APK de terceros bloqueados</label>
+              </fieldset>
+
+              <div class="inline-actions">
+                <button class="primary-button" type="submit">Buscar candidatos</button>
+                <button id="saveAllowlistShortcut" class="secondary-button" type="button">Configurar URL oficial</button>
+              </div>
+            </form>
+            <div id="candidateResults" class="result-list" aria-live="polite"></div>
+          </div>
+
+          <div id="devicePanel" class="entry-panel">
+            <form id="deviceForm" class="stack">
+              <label>
+                Package name instalado
+                <input id="devicePackage" type="text" placeholder="com.example.app" autocomplete="off" required />
+              </label>
+              <div class="field-row two">
+                <label>
+                  Serial del dispositivo
+                  <input id="deviceSerial" type="text" placeholder="emulator-5554" autocomplete="off" />
+                </label>
+                <label>
+                  Carpeta de salida
+                  <input id="deviceOut" type="text" value="downloads" autocomplete="off" />
+                </label>
+              </div>
+              <button class="primary-button" type="submit">Importar y preparar analisis</button>
+            </form>
+            <div id="deviceResults" class="result-list" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <aside class="side-panel" aria-label="Ajustes y resultados">
+          <section id="settingsPanel" class="settings-section" aria-labelledby="settingsTitle">
+            <div class="section-head compact">
+              <div>
+                <h2 id="settingsTitle">Credenciales y permisos</h2>
+                <p>Se guardan localmente en `.env` con permisos 0600. Los secretos no se muestran despues de guardar.</p>
+              </div>
+            </div>
+            <form id="settingsForm" class="stack small">
+              <label>
+                Clave DeepSeek
+                <input id="deepseekKey" type="password" placeholder="Pegar clave nueva" autocomplete="off" />
+              </label>
+              <label class="check-line">
+                <input id="clearDeepseek" type="checkbox" />
+                Borrar clave DeepSeek guardada
+              </label>
+              <label>
+                Hosts oficiales permitidos
+                <textarea id="officialAllowlist" rows="3" placeholder="example.com, downloads.example.org"></textarea>
+              </label>
+              <label>
+                Ruta JSON Google Play Developer
+                <input id="googleCredsPath" type="text" placeholder="/path/to/service-account.json" autocomplete="off" />
+              </label>
+              <label class="check-line">
+                <input id="allowDynamic" type="checkbox" />
+                Permitir modo dinamico cuando se indique dispositivo
+              </label>
+              <button class="secondary-button" type="submit">Guardar ajustes locales</button>
+            </form>
+            <dl id="settingsState" class="state-list"></dl>
+          </section>
+
+          <section class="sources-section" aria-labelledby="sourcesTitle">
+            <h2 id="sourcesTitle">Fuentes disponibles</h2>
+            <div id="sourceList" class="source-list" aria-live="polite"></div>
+          </section>
+
+          <section class="report-section" aria-labelledby="reportsTitle">
+            <div class="section-head compact">
+              <div>
+                <h2 id="reportsTitle">Reportes recientes</h2>
+                <p>Abre el reporte o el prompt maestro cuando termine el analisis.</p>
+              </div>
+            </div>
+            <div id="analysisList" class="analysis-list" aria-live="polite"></div>
+          </section>
+        </aside>
+
+        <section class="output-panel" aria-labelledby="outputTitle">
+          <div class="section-head compact">
+            <div>
+              <h2 id="outputTitle">Resultado</h2>
+              <p id="outputSubtitle">Los mensajes importantes aparecen aqui.</p>
+            </div>
+            <button id="clearOutput" class="ghost-button" type="button">Limpiar</button>
+          </div>
+          <div id="toast" class="toast" role="status" aria-live="polite">Listo para comenzar.</div>
+          <pre id="outputBox" tabindex="0"></pre>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

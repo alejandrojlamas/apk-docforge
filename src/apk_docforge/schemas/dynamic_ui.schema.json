@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dynamic_ui.schema.json",
+  "type": "object",
+  "required": ["schema_version", "status"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "status": { "type": "string" },
+    "screens": { "type": "array" },
+    "ui_elements": { "type": "array" },
+    "nodes": { "type": "array" },
+    "edges": { "type": "array" },
+    "blocked_flows": { "type": "array" },
+    "runtime_errors": { "type": "array" }
+  },
+  "additionalProperties": true
+}

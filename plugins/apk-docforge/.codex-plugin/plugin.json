@@ -1,0 +1,41 @@
+{
+  "name": "apk-docforge",
+  "version": "0.1.0",
+  "description": "Local Android APK documentation and audit pipeline.",
+  "entrypoints": {
+    "cli": "apk-docforge",
+    "api": "apk-docforge serve --host 127.0.0.1 --port 8765",
+    "mcp": "apk-docforge mcp-server"
+  },
+  "mcpServers": {
+    "apk-docforge": {
+      "transport": "stdio",
+      "command": "apk-docforge",
+      "args": ["mcp-server"]
+    }
+  },
+  "api": {
+    "base_url": "http://127.0.0.1:8765",
+    "health": "/api/health"
+  },
+  "tools": [
+    "search_apps",
+    "download_app",
+    "analyze_artifact",
+    "get_analysis",
+    "get_report",
+    "get_codex_prompt",
+    "list_findings",
+    "list_features",
+    "list_screens"
+  ],
+  "phase": "4",
+  "policy": {
+    "no_bypass": true,
+    "static_default": true,
+    "dynamic_requires_device": true,
+    "safe_navigation_only": true,
+    "no_external_apk_upload": true,
+    "documentation_llm": "deepseek"
+  }
+}

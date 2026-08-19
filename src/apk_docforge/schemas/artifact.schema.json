@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "artifact.schema.json",
+  "type": "object",
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "analysis_id": { "type": "string" },
+    "artifacts": { "type": "array" },
+    "agent": { "type": "string" },
+    "status": { "type": "string" },
+    "data": { "type": "object" },
+    "evidence_refs": { "type": "array" },
+    "warnings": { "type": "array" }
+  },
+  "additionalProperties": true
+}

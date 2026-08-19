@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "network.schema.json",
+  "type": "object",
+  "required": ["schema_version", "endpoints"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["domain", "type", "confidence", "evidence_refs"],
+        "properties": {
+          "url": { "type": ["string", "null"] },
+          "domain": { "type": ["string", "null"] },
+          "type": { "type": "string" },
+          "status": { "type": "string", "enum": ["observed", "inferred", "unknown"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidence_refs": { "type": "array" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

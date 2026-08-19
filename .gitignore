@@ -1,0 +1,14 @@
+.venv/
+.env
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+*.db
+outputs/
+cache/
+quarantine/
+downloads/
+data/
+dist/
+build/

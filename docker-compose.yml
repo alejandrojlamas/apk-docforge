@@ -1,0 +1,26 @@
+services:
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:v4.5.1
+    profiles: ["mobsf"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data/mobsf:/home/mobsf/.MobSF
+
+  postgres:
+    image: postgres:16
+    profiles: ["future"]
+    environment:
+      POSTGRES_DB: apk_docforge
+      POSTGRES_USER: apk_docforge
+      POSTGRES_PASSWORD: ${APK_DOCFORGE_POSTGRES_PASSWORD:-}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    profiles: ["future"]
+    ports:
+      - "127.0.0.1:6379:6379"
